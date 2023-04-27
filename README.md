@@ -103,7 +103,7 @@ Praqma Network MultiTool (with NGINX) - frontend-85f54fff68-dqsrh - 10.233.105.1
 Создаем сетевые политики, чтобы обеспечить выполнение пункта 4 данного задания
  - [NP-Default](file/network-policy/00-default.yaml)
 
- - [NP-Frontend](file/network-policy/10-frontend.yaml)
+ - [NP-Frontend](file/network-policy/10-frontend.yaml) - не обязательно, тест(запрещает доступ непосредственно к frontend)
  
  - [NP-Backend](file/network-policy/20-backend.yaml)
  
