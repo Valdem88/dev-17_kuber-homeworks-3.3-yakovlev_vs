@@ -120,9 +120,6 @@ root@masterk8s:~/main# kubectl exec frontend-85f54fff68-dqsrh -- curl cache
 curl: (28) Failed to connect to cache port 80 after 130383 ms: Operation timed out
 command terminated with exit code 28
 
-
-root@masterk8s:~/main# kubectl apply -f n-pol/10-frontend.yaml 
-networkpolicy.networking.k8s.io/frontend created
 ```
 
 Разрешающие правила для наших подов
