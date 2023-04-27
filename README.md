@@ -106,7 +106,7 @@ Praqma Network MultiTool (with NGINX) - frontend-85f54fff68-dqsrh - 10.233.105.1
  - [NP-Frontend](file/network-policy/10-frontend.yaml)
  
  - [NP-Backend](file/network-policy/20-backend.yaml)
-
+ 
  - [NP-Cache](file/network-policy/30-cache.yaml)
 
 Общее запрещающее правило. Сразу проверяем.
@@ -119,13 +119,16 @@ root@masterk8s:~/main# kubectl exec frontend-85f54fff68-dqsrh -- curl cache
   0     0    0     0    0     0      0      0 --:--:--  0:02:10 --:--:--     0
 curl: (28) Failed to connect to cache port 80 after 130383 ms: Operation timed out
 command terminated with exit code 28
+
+
+root@masterk8s:~/main# kubectl apply -f n-pol/10-frontend.yaml 
+networkpolicy.networking.k8s.io/frontend created
 ```
 
 Разрешающие правила для наших подов
 
 ```bash
-root@masterk8s:~/main# kubectl apply -f n-pol/10-frontend.yaml 
-networkpolicy.networking.k8s.io/frontend created
+
 root@masterk8s:~/main# kubectl apply -f n-pol/20-backend.yaml 
 networkpolicy.networking.k8s.io/backend created
 root@masterk8s:~/main# kubectl apply -f n-pol/30-cache.yaml 
@@ -166,17 +169,34 @@ root@masterk8s:~/main# kubectl exec backend-7f6ffd4fb4-jj5dv -- curl --max-time 
 curl: (28) Connection timed out after 10000 milliseconds
 command terminated with exit code 28
 
-root@masterk8s:~/main# kubectl exec cache-7bb8f4764b-bzm7c -- curl --max-time 10 frontend
+root@masterk8s:~# kubectl exec cache-7bb8f4764b-bzm7c -- curl --max-time 10 frontend
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0curl: (6) Could not resolve host: frontend
-command terminated with exit code 6
-root@masterk8s:~/main# kubectl exec cache-7bb8f4764b-bzm7c -- curl --max-time 10 backend
+  0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+curl: (28) Connection timed out after 10001 milliseconds
+command terminated with exit code 28
+root@masterk8s:~# kubectl exec cache-7bb8f4764b-bzm7c -- curl --max-time 10 backend
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:--  0:00:04 --:--:--     0curl: (6) Could not resolve host: backend
-command terminated with exit code 6
+  0     0    0     0    0     0      0      0 --:--:--  0:00:10 --:--:--     0
+curl: (28) Connection timed out after 10001 milliseconds
+command terminated with exit code 28
 ```
+
+#### Доработка
+
+Предлагаю вам вернуться к следующим пунктам:
+1. Какую функцию выполняет этот манифест? Не повторяет ли он дефолтную политику неймспейса?
+
+Ответ: Не совсем повторяет. Манифест networkpolicy `10-frontend.yaml` выполняет роль запрещающего правила только для frontend.
+По сути оно не нужно так как есть правило `default-deny-ingress`. Правило не мешает выполнению условия пункта №4.
+
+
+2. Для чего приложению cache исходящие соединения?
+Просьба внести правки или обосновать принятые решения. Пока отправляю работу на доработку.
+
+Ответ: Манифест `30-cache.yaml` разрешает бекенду доступ на кэш. Параметр `- Egress` не нужен, убрал его.
+
 
 
 
